@@ -10,17 +10,17 @@ defmodule FusionJWTAuthentication.CertificateStore do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  @spec get_certificate(Ecto.UUID.t()) :: String.t() | nil
+  @spec get_certificate(FusionJWTAuthentication.API.JWT.uuid()) :: String.t() | nil
   def get_certificate(client_id) do
     case :ets.whereis(:certificate_store) do
-      ref when is_reference(ref) ->
+      :undefined ->
+        raise RuntimeError, message: "ETS table is missing"
+
+      ref ->
         case :ets.lookup(ref, client_id) do
           [] -> GenServer.call(__MODULE__, {:fetch_certificate, client_id})
           [{_key, result}] -> result
         end
-
-      :undefined ->
-        raise RuntimeError, message: "ETS table is missing"
     end
   end
 

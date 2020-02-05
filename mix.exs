@@ -19,12 +19,19 @@ defmodule FusionJWTAuthentication.MixProject do
         "coveralls.post": :test,
         "coveralls.html": :test
       ],
-      deps: deps()
+      deps: deps(),
+      dialyzer: dialyzer()
     ]
   end
 
   defp elixirc_paths(:prod), do: ["lib"]
   defp elixirc_paths(_), do: ["lib", "test/support"]
+
+  defp dialyzer do
+    [
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
+  end
 
   defp description do
     "Plug for verifying fusionauth certificate signed jwt tokens"
@@ -55,7 +62,9 @@ defmodule FusionJWTAuthentication.MixProject do
       {:httpoison, "~> 1.4"},
       {:jason, "~> 1.0"},
       {:credo, ">= 0.0.0", only: :dev},
-      {:excoveralls, "~> 0.12", only: :test}
+      {:excoveralls, "~> 0.12", only: :test},
+      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 end

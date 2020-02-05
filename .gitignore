@@ -24,3 +24,4 @@ fusion_jwt_authentication-*.tar
 
 /.idea
 /fusion_jwt_authentication.iml
+/priv/plts/
