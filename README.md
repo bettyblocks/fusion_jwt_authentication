@@ -1,3 +1,5 @@
+https://travis-ci.org/nulian/fusion_jwt_authentication.svg?branch=master
+
 # FusionJwtAuthentication
 
 **TODO: Add description**
