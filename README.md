@@ -1,4 +1,4 @@
-https://travis-ci.org/nulian/fusion_jwt_authentication.svg?branch=master
+[![Build Status](https://travis-ci.org/nulian/fusion_jwt_authentication.svg?branch=master)](https://travis-ci.org/nulian/fusion_jwt_authentication)
 
 # FusionJwtAuthentication
 
