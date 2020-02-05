@@ -3,7 +3,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   This plug handles JWT from fusion auth
   """
 
-  alias FusionJWTAuthentication.{CertificateStore, Token}
+  alias FusionJWTAuthentication.{CertificateStore, ErrorView, Token}
   alias Joken.Signer
   alias Phoenix.Controller
   alias Plug.Conn
@@ -55,6 +55,6 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   end
 
   defp error_view do
-    Application.get_env(:fusion_jwt_authentication, :error_view)
+    Application.get_env(:fusion_jwt_authentication, :error_view) || ErrorView
   end
 end

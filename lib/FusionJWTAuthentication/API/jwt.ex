@@ -18,7 +18,7 @@ defmodule FusionJWTAuthentication.API.JWT do
   end
 
   defp request_public_key(client_id) do
-    base_url() <> "/api/jwt/public-key?applicationId=#{client_id}"
+    "#{base_url()}/api/jwt/public-key?applicationId=#{client_id}"
     |> http_client().get()
     |> handle_response()
   end
@@ -28,7 +28,7 @@ defmodule FusionJWTAuthentication.API.JWT do
   end
 
   defp http_client do
-    Application.get_env(:fusion_jwt_authentication, :http_client)
+    Application.get_env(:fusion_jwt_authentication, :http_client) || HTTPoison
   end
 
   @spec handle_response({:ok, Response.t()} | {:error, Error.t()}) ::
