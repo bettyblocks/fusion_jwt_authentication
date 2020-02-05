@@ -1,4 +1,4 @@
-defmodule Synapse.HTTPFusionMock do
+defmodule FusionJWTAuthentication.HTTPFusionMock do
   @moduledoc """
   Mock client for calls to fusionauth
   """
