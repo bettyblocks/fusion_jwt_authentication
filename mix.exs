@@ -1,4 +1,4 @@
-defmodule FusionJwtAuthentication.MixProject do
+defmodule FusionJWTAuthentication.MixProject do
   use Mix.Project
 
   def project do
@@ -8,6 +8,7 @@ defmodule FusionJwtAuthentication.MixProject do
       elixir: "~> 1.9",
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
+      elixirc_options: [warnings_as_errors: true],
       package: package(),
       start_permanent: Mix.env() == :prod,
       build_embedded: Mix.env() == :prod,
@@ -23,15 +24,15 @@ defmodule FusionJwtAuthentication.MixProject do
   end
 
   defp elixirc_paths(:prod), do: ["lib"]
-  defp elixirc_paths(_), do: ["lib", "test/support", "integration_test"]
+  defp elixirc_paths(_), do: ["lib", "test/support"]
 
   defp description do
-    "RabbitMQ-backed background job processing system"
+    "Plug for verifying fusionauth certificate signed jwt tokens"
   end
 
   defp package do
     %{
-      files: ["lib", "mix.exs", "docs/*.md", "LICENSE"],
+      files: ["lib", "mix.exs", "LICENSE"],
       maintainers: ["Peter Arentsen"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/bettyblocks/fusion_jwt_authentication"}
@@ -41,18 +42,20 @@ defmodule FusionJwtAuthentication.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :jason],
+      mod: {FusionJWTAuthentication, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:json_web_token, ">= 0.0.0"},
+      {:joken, "~> 2.0"},
+      {:phoenix, ">= 1.3.0"},
+      {:httpoison, "~> 1.4"},
+      {:jason, "~> 1.0"},
       {:credo, ">= 0.0.0", only: :dev},
       {:excoveralls, "~> 0.12", only: :test}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
   end
 end

@@ -1,18 +1,13 @@
-defmodule FusionJwtAuthentication do
+defmodule FusionJWTAuthentication do
   @moduledoc """
   Documentation for FusionJwtAuthentication.
   """
+  use Application
 
-  @doc """
-  Hello world.
+  alias FusionJWTAuthentication.CertificateStore
 
-  ## Examples
-
-      iex> FusionJwtAuthentication.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def start(_type, _args) do
+    children = [CertificateStore]
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
