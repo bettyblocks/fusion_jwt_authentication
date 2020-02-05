@@ -26,7 +26,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       |> build_conn("/")
       |> put_req_cookie("jwt_token", "#{jwt}")
       |> fetch_cookies()
-      |> FusionJWTParserPlug.call([])
+      |> FusionJWTAuthPlug.call([])
 
     assert status == 401
     assert halted
@@ -47,7 +47,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       |> build_conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
-      |> FusionJWTParserPlug.call([])
+      |> FusionJWTAuthPlug.call([])
 
     assert conn.status == nil
     refute conn.halted
@@ -68,7 +68,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       |> build_conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
-      |> FusionJWTParserPlug.call([])
+      |> FusionJWTAuthPlug.call([])
 
     assert conn.status == nil
     refute conn.halted
@@ -80,7 +80,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       :get
       |> build_conn("/")
       |> fetch_cookies()
-      |> FusionJWTParserPlug.call([])
+      |> FusionJWTAuthPlug.call([])
 
     assert status == 401
     assert halted
