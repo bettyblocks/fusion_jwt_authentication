@@ -4,6 +4,6 @@ defmodule FusionJWTAuthentication.Token do
 
   @impl true
   def token_config do
-    default_claims(Keyword.put(Application.get_env(:fusion_jwt_authentication, :claim_options), :skip, [:aud]))
+    default_claims(Application.get_env(:fusion_jwt_authentication, :claim_options))
   end
 end

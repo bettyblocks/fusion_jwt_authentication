@@ -16,9 +16,10 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
 
   defp parse_jwt(jwt, conn, _opts) when is_binary(jwt) do
     with {:ok, %{"alg" => "RS256"}} <- Joken.peek_header(jwt),
-         {:ok, %{"aud" => audience}} <- Joken.peek_claims(jwt),
+         {:ok, claims} <- Joken.peek_claims(jwt),
+         {:ok, %{"aud" => audience}} <- Token.validate(claims),
          certificate when is_binary(certificate) <- CertificateStore.get_certificate(audience),
-         {:ok, claims} <- Token.verify_and_validate(jwt, Signer.create("RS256", %{"pem" => certificate})) do
+         {:ok, claims} <- Token.verify(jwt, Signer.create("RS256", %{"pem" => certificate})) do
       handle_login(conn, claims)
     else
       {_, _claims} ->
