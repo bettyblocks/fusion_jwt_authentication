@@ -2,8 +2,8 @@ defmodule FusionJWTAuthentication.HTTPFusionMock do
   @moduledoc """
   Mock client for calls to fusionauth
   """
-  alias HTTPoison.Response
   alias FusionJWTAuthentication.Support.FusionGlobalAppCertificate
+  alias HTTPoison.Response
 
   def get("/api/jwt/public-key?applicationId=11111111-1111-1111-1111-111111111111") do
     public_key = %{"publicKey" => FusionGlobalAppCertificate.public_key()["pem"]}
