@@ -10,6 +10,10 @@ defmodule FusionJWTAuthentication.HTTPFusionMock do
     {:ok, %Response{body: Jason.encode!(public_key), status_code: 200}}
   end
 
+  def get("/api/jwt/public-key?applicationId=11111111-1111-1111-1111-111111111112") do
+    {:ok, %Response{body: Jason.encode!(%{}), status_code: 404}}
+  end
+
   def get("/api/jwt/public-key?applicationId=time") do
     {:ok,
      %Response{

@@ -75,6 +75,39 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
     refute Map.has_key?(conn.assigns, :cas_token)
   end
 
+  test "should return not found when certificate is not found" do
+    claims = %{
+      "exp" => Joken.current_time() + 120,
+      "aud" => "11111111-1111-1111-1111-111111111112"
+    }
+
+    Application.put_env(:fusion_jwt_authentication, :claim_options,
+      iss: "bettyblocks.com",
+      aud: "11111111-1111-1111-1111-111111111112"
+    )
+
+    signer = Signer.create("RS256", FusionGlobalAppCertificate.private_key())
+    jwt = Token.generate_and_sign!(claims, signer)
+
+    conn =
+      :get
+      |> build_conn("/")
+      |> put_req_cookie("jwt_token", jwt)
+      |> fetch_cookies()
+      |> FusionJWTAuthPlug.call([])
+
+    assert conn.status == 404
+    assert conn.halted
+    refute Map.has_key?(conn.assigns, :cas_token)
+
+    on_exit(fn ->
+      Application.put_env(:fusion_jwt_authentication, :claim_options,
+        iss: "bettyblocks.com",
+        aud: "11111111-1111-1111-1111-111111111111"
+      )
+    end)
+  end
+
   test "forbids connections without an \"authorization\" header" do
     %{status: status, halted: halted} =
       :get
