@@ -2,7 +2,23 @@
 
 # FusionJwtAuthentication
 
-**TODO: Add description**
+Library to authenticate jwt token with a plug.
+
+Below can be configured in your app.
+`error_view` you can change to your phoenix error view though it needs the options 401.json and 404.json
+
+`claim_options`  Follow the joker claims though you will probably need to set the iss and aud in a keyword list. `iss` is the jwt supplier name from the jwt.
+`aud` is the application of fusionauth the jwt is used for logging in to.
+
+`base_url` Should be the url of fusionauth like `fusionauth.test.com`
+
+```elixir
+config :fusion_jwt_authentication,
+  http_client: HTTPoison,
+  claim_options: [],
+  error_view: FusionJWTAuthentication.ErrorView,
+  base_url: ""
+```
 
 ## Installation
 

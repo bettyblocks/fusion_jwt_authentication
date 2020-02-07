@@ -1,6 +1,6 @@
 defmodule FusionJWTAuthentication.CertificateStore do
   @moduledoc """
-  Fetch certificate for certain application and store it in ets
+  Fetch certificate for certain application and store it in ets table to cache values
   """
   use GenServer, restart: :permanent
 

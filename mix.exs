@@ -4,7 +4,7 @@ defmodule FusionJWTAuthentication.MixProject do
   def project do
     [
       app: :fusion_jwt_authentication,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.9",
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -39,10 +39,10 @@ defmodule FusionJWTAuthentication.MixProject do
 
   defp package do
     %{
-      files: ["lib", "mix.exs", "LICENSE"],
+      files: ["lib", "mix.exs", "LICENSE", "README.md"],
       maintainers: ["Peter Arentsen"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/bettyblocks/fusion_jwt_authentication"}
+      links: %{"GitHub" => "https://github.com/nulian/fusion_jwt_authentication"}
     }
   end
 
