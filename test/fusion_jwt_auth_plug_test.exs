@@ -3,8 +3,8 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   use Phoenix.ConnTest
 
   alias FusionJWTAuthentication.FusionJWTAuthPlug
-  alias FusionJWTAuthentication.Token
   alias FusionJWTAuthentication.Support.FusionGlobalAppCertificate
+  alias FusionJWTAuthentication.Token
   alias Joken.Signer
 
   setup do
@@ -76,6 +76,13 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   end
 
   test "should return not found when certificate is not found" do
+    on_exit(fn ->
+      Application.put_env(:fusion_jwt_authentication, :claim_options,
+        iss: "bettyblocks.com",
+        aud: "11111111-1111-1111-1111-111111111111"
+      )
+    end)
+
     claims = %{
       "exp" => Joken.current_time() + 120,
       "aud" => "11111111-1111-1111-1111-111111111112"
@@ -99,13 +106,6 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
     assert conn.status == 404
     assert conn.halted
     refute Map.has_key?(conn.assigns, :cas_token)
-
-    on_exit(fn ->
-      Application.put_env(:fusion_jwt_authentication, :claim_options,
-        iss: "bettyblocks.com",
-        aud: "11111111-1111-1111-1111-111111111111"
-      )
-    end)
   end
 
   test "forbids connections without an \"authorization\" header" do
