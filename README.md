@@ -28,7 +28,7 @@ by adding `fusion_jwt_authentication` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:fusion_jwt_authentication, "~> 0.1.0"}
+    {:fusion_jwt_authentication, "~> 0.2"}
   ]
 end
 ```
