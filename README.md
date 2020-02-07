@@ -4,14 +4,6 @@
 
 Library to authenticate jwt token with a plug.
 
-Can be added to a phoenix router pipeline like below. Cookies should also be fetched because at the moment it fetches jwt from cookies.
-```elixir
-pipeline :auth do
-  plug :fetch_cookies
-  plug FusionJWTAuthentication.FusionJWTAuthPlug
-end
-```
-
 Below can be configured in your app.
 `error_view` you can change to your phoenix error view though it needs the options 401.json and 404.json
 
@@ -38,6 +30,14 @@ def deps do
   [
     {:fusion_jwt_authentication, "~> 0.2"}
   ]
+end
+```
+
+Can be added to a phoenix router pipeline like below. Cookies should also be fetched because at the moment it fetches jwt from cookies.
+```elixir
+pipeline :auth do
+  plug :fetch_cookies
+  plug FusionJWTAuthentication.FusionJWTAuthPlug
 end
 ```
 
