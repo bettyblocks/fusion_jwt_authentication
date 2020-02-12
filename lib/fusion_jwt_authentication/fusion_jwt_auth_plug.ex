@@ -2,14 +2,17 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   @moduledoc """
   This plug handles JWT from fusion auth
   """
+  @behaviour Plug
 
   alias FusionJWTAuthentication.{CertificateStore, ErrorView, Token}
   alias Joken.Signer
   alias Phoenix.Controller
   alias Plug.Conn
 
+  @impl true
   def init(options), do: options
 
+  @impl true
   def call(conn, options) do
     parse_jwt(conn.cookies["jwt_token"], conn, options)
   end
