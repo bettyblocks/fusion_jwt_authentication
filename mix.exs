@@ -63,7 +63,7 @@ defmodule FusionJWTAuthentication.MixProject do
       {:jason, "~> 1.0"},
       {:credo, ">= 0.0.0", only: :dev},
       {:excoveralls, "~> 0.12", only: :test},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
