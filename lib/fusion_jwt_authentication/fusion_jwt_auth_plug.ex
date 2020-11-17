@@ -10,20 +10,28 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   alias Plug.Conn
 
   @impl true
-  def init(options), do: options
+  def init(options \\ []) do
+    login_handler =
+      Application.get_env(:fusion_jwt_authentication, :login_handler, FusionJWTAuthentication.DefaultHandleLogin)
+
+    Keyword.put(options, :login_handler, login_handler)
+  end
 
   @impl true
   def call(conn, options) do
     parse_jwt(conn.cookies["jwt_token"], conn, options)
   end
 
-  defp parse_jwt(jwt, conn, _opts) when is_binary(jwt) do
+  defp parse_jwt(jwt, conn, opts) when is_binary(jwt) do
+    login_handler = Keyword.get(opts, :login_handler)
+
     with {:ok, %{"alg" => "RS256"}} <- Joken.peek_header(jwt),
          {:ok, claims} <- Joken.peek_claims(jwt),
          {:ok, %{"aud" => audience}} <- Token.validate(claims),
          certificate when is_binary(certificate) <- CertificateStore.get_certificate(audience),
-         {:ok, claims} <- Token.verify(jwt, Signer.create("RS256", %{"pem" => certificate})) do
-      handle_login(conn, claims)
+         {:ok, claims} <- Token.verify(jwt, Signer.create("RS256", %{"pem" => certificate})),
+         {:ok, conn} <- login_handler.handle_login(conn, claims) do
+      conn
     else
       {_, _claims} ->
         send_unauthorized_response(conn)
@@ -34,12 +42,6 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   end
 
   defp parse_jwt(_, conn, _opts), do: send_unauthorized_response(conn)
-
-  defp handle_login(conn, %{"cas_token" => cas_token}) do
-    Conn.assign(conn, :cas_token, cas_token)
-  end
-
-  defp handle_login(conn, _), do: conn
 
   defp send_unauthorized_response(conn) do
     conn

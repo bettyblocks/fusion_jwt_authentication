@@ -47,7 +47,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       |> build_conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
-      |> FusionJWTAuthPlug.call([])
+      |> FusionJWTAuthPlug.call(FusionJWTAuthPlug.init())
 
     assert conn.status == nil
     refute conn.halted
@@ -68,7 +68,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       |> build_conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
-      |> FusionJWTAuthPlug.call([])
+      |> FusionJWTAuthPlug.call(FusionJWTAuthPlug.init())
 
     assert conn.status == nil
     refute conn.halted
