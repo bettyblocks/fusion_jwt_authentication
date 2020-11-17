@@ -1,6 +1,7 @@
 defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   use ExUnit.Case
-  use Phoenix.ConnTest
+  import Plug.Conn
+  import Phoenix.ConnTest
 
   alias FusionJWTAuthentication.FusionJWTAuthPlug
   alias FusionJWTAuthentication.Support.FusionGlobalAppCertificate
