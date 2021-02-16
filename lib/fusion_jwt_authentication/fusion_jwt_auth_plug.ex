@@ -36,6 +36,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
       {:error, :signature_error} ->
         {:ok, %{"aud" => audience}} = Joken.peek_claims(jwt)
         GenServer.call(CertificateStore, {:fetch_certificate, audience})
+        send_unauthorized_response(conn)
 
       {_, _claims} ->
         send_unauthorized_response(conn)
