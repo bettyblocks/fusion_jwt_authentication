@@ -33,6 +33,10 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
          {:ok, conn} <- login_handler.handle_login(conn, claims) do
       conn
     else
+      {:error, :signature_error} ->
+        {:ok, %{"aud" => audience}} = Joken.peek_claims(jwt)
+        GenServer.call(CertificateStore, {:fetch_certificate, audience})
+
       {_, _claims} ->
         send_unauthorized_response(conn)
 
