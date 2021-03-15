@@ -18,7 +18,7 @@ defmodule FusionJWTAuthentication.CertificateStore do
 
       ref ->
         case :ets.lookup(ref, client_id) do
-          [] -> GenServer.call(__MODULE__, {:fetch_certificate, client_id})
+          [] -> GenServer.call(__MODULE__, {:fetch_certificate, client_id}, 10000)
           [{_key, result}] -> result
         end
     end
