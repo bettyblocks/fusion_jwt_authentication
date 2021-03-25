@@ -5,7 +5,6 @@
 Library to authenticate jwt token with a plug.
 
 Below can be configured in your app.
-`error_view` you can change to your phoenix error view though it needs the options 401.json and 404.json
 
 `claim_options`  Follow the joker claims though you will probably need to set the iss and aud in a keyword list. `iss` is the jwt supplier name from the jwt.
 `aud` is the application of fusionauth the jwt is used for logging in to.
@@ -16,7 +15,6 @@ Below can be configured in your app.
 config :fusion_jwt_authentication,
   http_client: HTTPoison,
   claim_options: [],
-  error_view: FusionJWTAuthentication.ErrorView,
   base_url: ""
 ```
 
@@ -28,7 +26,7 @@ by adding `fusion_jwt_authentication` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:fusion_jwt_authentication, "~> 0.2"}
+    {:fusion_jwt_authentication, "~> 0.5"}
   ]
 end
 ```
@@ -45,3 +43,7 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/fusion_jwt_authentication](https://hexdocs.pm/fusion_jwt_authentication).
 
+
+### Backwards compatibility
+
+In version 0.5 the dependency of phoenix was dropped, and therefore the ErrorView no longer be updated. If you need this stick to version 0.4.

@@ -4,7 +4,7 @@ defmodule FusionJWTAuthentication.MixProject do
   def project do
     [
       app: :fusion_jwt_authentication,
-      version: "0.4.0",
+      version: "0.5.0",
       elixir: "~> 1.9",
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -58,7 +58,7 @@ defmodule FusionJWTAuthentication.MixProject do
   defp deps do
     [
       {:joken, "~> 2.0"},
-      {:phoenix, ">= 1.3.0"},
+      {:plug, "~> 1.11"},
       {:httpoison, "~> 1.4"},
       {:jason, "~> 1.0"},
       {:credo, ">= 0.0.0", only: :dev},

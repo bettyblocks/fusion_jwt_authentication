@@ -4,9 +4,8 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   """
   @behaviour Plug
 
-  alias FusionJWTAuthentication.{CertificateStore, ErrorView, Token}
+  alias FusionJWTAuthentication.{CertificateStore, Token}
   alias Joken.Signer
-  alias Phoenix.Controller
   alias Plug.Conn
 
   @impl true
@@ -45,21 +44,19 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
 
   defp send_unauthorized_response(conn) do
     conn
-    |> Conn.put_status(401)
-    |> Controller.put_view(error_view())
-    |> Controller.render("401.json")
+    |> put_json(401, "Access denied")
     |> Conn.halt()
   end
 
   defp send_not_found_response(conn) do
     conn
-    |> Conn.put_status(404)
-    |> Controller.put_view(error_view())
-    |> Controller.render("404.json")
+    |> put_json(404, "Page not found")
     |> Conn.halt()
   end
 
-  defp error_view do
-    Application.get_env(:fusion_jwt_authentication, :error_view) || ErrorView
+  defp put_json(conn, status, message) do
+    conn
+    |> Conn.put_resp_header("content-type", "application/json")
+    |> Conn.send_resp(status, Jason.encode!(%{status: status, message: message}))
   end
 end
