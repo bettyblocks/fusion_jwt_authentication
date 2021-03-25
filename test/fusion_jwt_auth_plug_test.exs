@@ -1,7 +1,8 @@
 defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   use ExUnit.Case
+  use Plug.Test
+
   import Plug.Conn
-  import Phoenix.ConnTest
 
   alias FusionJWTAuthentication.FusionJWTAuthPlug
   alias FusionJWTAuthentication.Support.FusionGlobalAppCertificate
@@ -24,7 +25,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
 
     %{status: status, halted: halted} =
       :get
-      |> build_conn("/")
+      |> conn("/")
       |> put_req_cookie("jwt_token", "#{jwt}")
       |> fetch_cookies()
       |> FusionJWTAuthPlug.call([])
@@ -45,7 +46,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
 
     conn =
       :get
-      |> build_conn("/")
+      |> conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
       |> FusionJWTAuthPlug.call(FusionJWTAuthPlug.init())
@@ -66,7 +67,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
 
     conn =
       :get
-      |> build_conn("/")
+      |> conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
       |> FusionJWTAuthPlug.call(FusionJWTAuthPlug.init())
@@ -99,7 +100,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
 
     conn =
       :get
-      |> build_conn("/")
+      |> conn("/")
       |> put_req_cookie("jwt_token", jwt)
       |> fetch_cookies()
       |> FusionJWTAuthPlug.call([])
@@ -112,7 +113,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   test "forbids connections without an \"authorization\" header" do
     %{status: status, halted: halted} =
       :get
-      |> build_conn("/")
+      |> conn("/")
       |> fetch_cookies()
       |> FusionJWTAuthPlug.call([])
 

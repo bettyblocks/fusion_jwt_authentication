@@ -58,7 +58,7 @@ defmodule FusionJWTAuthentication.MixProject do
   defp deps do
     [
       {:joken, "~> 2.0"},
-      {:phoenix, ">= 1.3.0"},
+      {:plug, "~> 1.11"},
       {:httpoison, "~> 1.4"},
       {:jason, "~> 1.0"},
       {:credo, ">= 0.0.0", only: :dev},
