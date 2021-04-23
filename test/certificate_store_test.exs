@@ -1,4 +1,4 @@
-defmodule Synapse.FusionAuth.CertificateStoreTest do
+defmodule FusionJWTAuthentication.CertificateStoreTest do
   use ExUnit.Case
 
   alias FusionJWTAuthentication.CertificateStore
