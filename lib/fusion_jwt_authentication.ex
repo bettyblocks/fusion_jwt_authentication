@@ -9,7 +9,7 @@ defmodule FusionJWTAuthentication do
   alias FusionJWTAuthentication.TokenJWKS
 
   def start(_type, _args) do
-   token_handler = Application.get_env(:fusion_jwt_authentication, :token_handler)
+   token_handler = Application.get_env(:fusion_jwt_authentication, :token_verifier)
    children =
     if token_handler == TokenJWKS do
       [JWKS_Strategy]
