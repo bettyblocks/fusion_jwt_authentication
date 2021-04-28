@@ -9,7 +9,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   alias FusionJWTAuthentication.TokenCertificateStore
   alias FusionJWTAuthentication.TokenJWKS
   alias FusionJWTAuthentication.Support.TestUtils
-  alias FusionJWTAuthentication.Strategy
+  alias FusionJWTAuthentication.JWKS_Strategy
   alias Joken.Signer
 
   import Mox
@@ -133,7 +133,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   describe "fusion jwt auth plug using JWKS endpoint" do
     setup do
       Application.put_env(:fusion_jwt_authentication, :token_verifier, TokenJWKS)
-      Supervisor.start_link([Strategy], strategy: :one_for_one)
+      Supervisor.start_link([JWKS_Strategy], strategy: :one_for_one)
 
       on_exit(fn ->
         Application.delete_env(:fusion_jwt_authentication, :token_verifier)
@@ -191,7 +191,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
     end)
 
-    Strategy.fetch_signers(url, log_level: :debug)
+    JWKS_Strategy.fetch_signers(url, log_level: :debug)
   end
 
   defp expect_call(num_of_invocations \\ 1, function),

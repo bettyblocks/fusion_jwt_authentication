@@ -1,7 +1,7 @@
 defmodule FusionJWTAuthentication.TokenJWKSTest do
   use ExUnit.Case, async: false
   alias FusionJWTAuthentication.TokenJWKS
-  alias FusionJWTAuthentication.Strategy
+  alias FusionJWTAuthentication.JWKS_Strategy
   alias FusionJWTAuthentication.Support.TestUtils
 
   import Mox
@@ -11,7 +11,7 @@ defmodule FusionJWTAuthentication.TokenJWKSTest do
   setup :verify_on_exit!
 
   setup do
-    Supervisor.start_link([Strategy], strategy: :one_for_one)
+    Supervisor.start_link([JWKS_Strategy], strategy: :one_for_one)
     :ok
   end
 
@@ -39,8 +39,7 @@ defmodule FusionJWTAuthentication.TokenJWKSTest do
       {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
     end)
 
-    Strategy.fetch_signers(url, log_level: :debug)
-    #  Strategy.start_link(jwks_url: url, time_interval: 10)
+    JWKS_Strategy.fetch_signers(url, log_level: :debug)
     :timer.sleep(100)
   end
 

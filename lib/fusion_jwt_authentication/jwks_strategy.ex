@@ -1,4 +1,4 @@
-defmodule FusionJWTAuthentication.Strategy do
+defmodule FusionJWTAuthentication.JWKS_Strategy do
   use JokenJwks.DefaultStrategyTemplate
 
   def init_opts(opts) do
