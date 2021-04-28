@@ -67,7 +67,7 @@ defmodule FusionJWTAuthentication.MixProject do
       {:excoveralls, "~> 0.12", only: :test},
       {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
-      {:mox, "~> 1.0", only: :test},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 end
