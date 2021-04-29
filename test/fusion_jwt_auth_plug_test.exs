@@ -133,7 +133,13 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   describe "fusion jwt auth plug using JWKS endpoint" do
     setup do
       Application.put_env(:fusion_jwt_authentication, :token_verifier, TokenJWKS)
-      Supervisor.start_link([JWKS_Strategy], strategy: :one_for_one)
+      url = "https://fusionauth.test.well-known/jwks.json"
+
+      expect(TeslaAdapterMock, :call, fn _, _ ->
+        {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
+      end)
+
+      FusionJWTAuthentication.JWKS_Strategy.start_link(jwks_url: url, log_level: :debug)
 
       on_exit(fn ->
         Application.delete_env(:fusion_jwt_authentication, :token_verifier)
@@ -163,6 +169,10 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
     end
 
     test "if kid does not match, returns 401", %{cas_token: cas_token} do
+      expect(TeslaAdapterMock, :call, fn _one, _two ->
+        {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
+      end)
+
       claims = %{
         "cas_token" => cas_token,
         "exp" => Joken.current_time() + 120,
@@ -187,13 +197,10 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   def setup_jwks() do
     url = "https://fusionauth.test.well-known/jwks.json"
 
-    expect_call(fn %{url: ^url} ->
+    expect(TeslaAdapterMock, :call, fn _, _ ->
       {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
     end)
 
     JWKS_Strategy.fetch_signers(url, log_level: :debug)
   end
-
-  defp expect_call(num_of_invocations \\ 1, function),
-    do: expect(TeslaAdapterMock, :call, num_of_invocations, fn env, _opts -> function.(env) end)
 end
