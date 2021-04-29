@@ -12,41 +12,37 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   alias Joken.Signer
   alias FusionJWTAuthentication.API.JWT
 
+  use GenServer, restart: :permanent
+
   def start_link(arg) do
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  @doc false
+  @impl true
   def init(_) do
     {:ok, %{}, {:continue, :do_init}}
   end
 
+  @impl true
   def handle_continue(:do_init, _state) do
     EtsCache.new()
-    fetch_signers()
+    fetch_and_cache()
     {:noreply, %{}}
   end
 
   def match_signer_for_kid(kid) do
-    with {:cache, [{:signers, signers}]} <- {:cache, EtsCache.get_signers()},
-         {:signer, signer} when not is_nil(signer) <- {:signer, signers[kid]} do
+    with [{^kid, signer}] <- EtsCache.get_signer(kid) do
       {:ok, signer}
     else
-      {:signer, nil} ->
-        fetch_signer_and_validate_kid(kid)
-
-      {:cache, []} ->
-        fetch_signer_and_validate_kid(kid)
-
-      err ->
-        err
+      [] -> fetch_signer_and_match_kid(kid)
+      err -> err
     end
   end
 
-  def fetch_signer_and_validate_kid(kid) do
-    with true <- fetch_signers(),
-         {:cache, [{:signers, signers}]} <- {:cache, EtsCache.get_signers()},
-         {:signer, signer} when not is_nil(signer) <- {:signer, signers[kid]} do
+  def fetch_signer_and_match_kid(kid) do
+    fetch_and_cache()
+
+    with [{^kid, signer}] <- EtsCache.get_signer(kid) do
       {:ok, signer}
     else
       _ -> {:error, :kid_does_not_match}
@@ -54,7 +50,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   end
 
   @doc "Fetch signers"
-  def fetch_signers() do
+  def fetch_and_cache() do
     with {:ok, {_status_code, %{"keys" => keys}}} <- JWT.jwks(),
          {:ok, signers} <- validate_and_parse_keys(keys) do
       Logger.debug("Fetched signers. #{inspect(signers)}")
@@ -110,22 +106,16 @@ defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
   @doc "Starts ETS cache"
   def new do
     __MODULE__ =
-      :ets.new(__MODULE__, [
-        :set,
-        :public,
-        :named_table,
-        read_concurrency: true,
-        write_concurrency: true
-      ])
+      :ets.new(__MODULE__, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
   end
 
   @doc "Loads fetched signers"
-  def get_signers do
-    :ets.lookup(__MODULE__, :signers)
+  def get_signer(kid) do
+    :ets.lookup(__MODULE__, kid)
   end
 
   @doc "Puts fetched signers"
   def put_signers(signers) do
-    :ets.insert(__MODULE__, {:signers, signers})
+    Enum.map(signers, fn {kid, signer} -> :ets.insert(__MODULE__, {kid, signer}) end)
   end
 end
