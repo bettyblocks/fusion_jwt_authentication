@@ -3,6 +3,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   Contain strategy to fetch the JWKS if TokenJWKS is choosen as token_verifier.
   Automatically fetch the jwks when fusionauth application is started.
   Refetch the jwks once each time a kid isn't found inside the jwks.
+  The jwks is cached in an ets table
   """
 
   require Logger
@@ -26,7 +27,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     {:noreply, %{}}
   end
 
-  def match_signer_for_kid(kid, _opts) do
+  def match_signer_for_kid(kid) do
     with {:cache, [{:signers, signers}]} <- {:cache, EtsCache.get_signers()},
          {:signer, signer} when not is_nil(signer) <- {:signer, signers[kid]} do
       {:ok, signer}
@@ -35,7 +36,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
         fetch_signer_and_validate_kid(kid)
 
       {:cache, []} ->
-        {:error, :no_signers_fetched}
+        fetch_signer_and_validate_kid(kid)
 
       err ->
         err
@@ -46,6 +47,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     with true <- fetch_signers(),
          {:cache, [{:signers, signers}]} <- {:cache, EtsCache.get_signers()},
          {:signer, signer} when not is_nil(signer) <- {:signer, signers[kid]} do
+      {:ok, signer}
     else
       _ -> {:error, :kid_does_not_match}
     end
@@ -59,10 +61,10 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
       EtsCache.put_signers(signers)
     else
       {:error, _reason} = err ->
-        Logger.debug("Failed to fetch signers. Reason: #{inspect(err)}")
+        Logger.warn("#{__MODULE__} failed to fetch signers. Reason: #{inspect(err)}")
 
       err ->
-        Logger.debug("Unexpected error while fetching signers. Reason: #{inspect(err)}")
+        Logger.warn("#{__MODULE__} got an unexpected error while fetching signers. Reason: #{inspect(err)}")
     end
   end
 
@@ -86,7 +88,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     end
   rescue
     e ->
-      Logger.debug("""
+      Logger.warn("""
       Error while parsing a key entry fetched from the network.
 
       This should be investigated by a human.
@@ -105,8 +107,6 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
 end
 
 defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
-  @moduledoc "Simple ETS counter based state machine"
-
   @doc "Starts ETS cache"
   def new do
     __MODULE__ =

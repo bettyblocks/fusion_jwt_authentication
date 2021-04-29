@@ -4,20 +4,44 @@ defmodule FusionJWTAuthentication.TokenJWKSTest do
   alias FusionJWTAuthentication.JWKS_Strategy
   alias FusionJWTAuthentication.Support.TestUtils
 
-  test "module exists" do
-    assert is_list(TokenJWKS.module_info())
-  end
+  describe "test JWKS token" do
+    setup do
+      JWKS_Strategy.start_link([])
+      :ok
+    end
 
-  test "can fetch jwks and verify token" do
-    JWKS_Strategy.start_link([])
+    test "module exists" do
+      assert is_list(TokenJWKS.module_info())
+    end
 
-    jwt = TokenJWKS.generate_and_sign!(%{}, TestUtils.create_signer_with_kid("id2"))
+    test "can fetch jwks and verify token" do
+      jwt = TokenJWKS.generate_and_sign!(%{}, TestUtils.create_signer_with_kid("id2"))
 
-    assert {:ok, claims} = TokenJWKS.verify(jwt)
+      assert {:ok, claims} = TokenJWKS.verify(jwt)
 
-    assert %{
-             "aud" => "11111111-1111-1111-1111-111111111111",
-             "iss" => "bettyblocks.com"
-           } = claims
+      assert %{
+               "aud" => "11111111-1111-1111-1111-111111111111",
+               "iss" => "bettyblocks.com"
+             } = claims
+    end
+
+    test "if jwks signers does not exist in ets cache it does a refetch" do
+      :ets.delete(FusionJWTAuthentication.JWKS_Strategy.EtsCache, :signers)
+
+      jwt = TokenJWKS.generate_and_sign!(%{}, TestUtils.create_signer_with_kid("id2"))
+
+      assert {:ok, claims} = TokenJWKS.verify(jwt)
+
+      assert %{
+               "aud" => "11111111-1111-1111-1111-111111111111",
+               "iss" => "bettyblocks.com"
+             } = claims
+    end
+
+    test "it returns kid to not match when an invalid kid is supplied" do
+      jwt = TokenJWKS.generate_and_sign!(%{}, TestUtils.create_signer_with_kid("id4"))
+
+      assert {:error, :kid_does_not_match} = TokenJWKS.verify(jwt)
+    end
   end
 end
