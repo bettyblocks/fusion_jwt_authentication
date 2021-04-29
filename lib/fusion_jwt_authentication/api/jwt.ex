@@ -9,6 +9,13 @@ defmodule FusionJWTAuthentication.API.JWT do
   """
   @type uuid :: <<_::288>>
 
+  @spec jwks :: {:ok, any} | {:error, any}
+  def jwks() do
+    "#{base_url()}/.well-known/jwks.json"
+    |> http_client().get()
+    |> handle_response()
+  end
+
   @spec public_key(uuid) :: nil | String.t()
   def public_key(client_id) do
     case request_public_key(client_id) do

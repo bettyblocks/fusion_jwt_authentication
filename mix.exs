@@ -59,15 +59,13 @@ defmodule FusionJWTAuthentication.MixProject do
   defp deps do
     [
       {:joken, "~> 2.0"},
-      {:joken_jwks, "~> 1.4.0"},
       {:plug, "~> 1.11"},
       {:httpoison, "~> 1.4"},
       {:jason, "~> 1.0"},
       {:credo, ">= 0.0.0", only: :dev},
       {:excoveralls, "~> 0.12", only: :test},
       {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
-      {:mox, "~> 1.0", only: :test}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 end

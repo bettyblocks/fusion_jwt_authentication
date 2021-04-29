@@ -9,57 +9,30 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
 
   alias __MODULE__.EtsCache
   alias Joken.Signer
-  alias JokenJwks.{HttpFetcher, SignerMatchStrategy}
-
-  @behaviour SignerMatchStrategy
+  alias FusionJWTAuthentication.API.JWT
 
   def start_link(arg) do
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  @spec init_opts(opts :: Keyword.t()) :: Keyword.t()
-  def init_opts(opts) do
-    base_url = Application.get_env(:fusion_jwt_authentication, :base_url)
-    url = Keyword.get(opts, :jwks_url) || "#{base_url}/.well-known/jwks.json"
-
-    Keyword.merge(opts, jwks_url: url)
-  end
-
   @doc false
-  def init(opts) do
-    {:ok, %{opts: opts}, {:continue, :do_init}}
+  def init(_) do
+    {:ok, %{}, {:continue, :do_init}}
   end
 
-  def handle_continue(:do_init, %{opts: opts}) do
+  def handle_continue(:do_init, _state) do
     EtsCache.new()
-
-    opts =
-      Application.get_env(:joken_jwks, __MODULE__, [])
-      |> Keyword.merge(opts)
-      |> init_opts()
-
-    url = opts[:jwks_url] || raise "No url set for fetching JWKS!"
-
-    opts =
-      opts
-      |> Keyword.put(:jwks_url, url)
-
-    fetch_signers(url, opts)
+    fetch_signers()
     {:noreply, %{}}
   end
 
-  @impl SignerMatchStrategy
-  def match_signer_for_kid(kid, opts) do
-    opts =
-      opts
-      |> Keyword.put(:jwks_url, "https://fusionauth.test.well-known/jwks.json")
-
+  def match_signer_for_kid(kid, _opts) do
     with {:cache, [{:signers, signers}]} <- {:cache, EtsCache.get_signers()},
          {:signer, signer} when not is_nil(signer) <- {:signer, signers[kid]} do
       {:ok, signer}
     else
       {:signer, nil} ->
-        fetch_signer_and_validate_kid(kid, opts)
+        fetch_signer_and_validate_kid(kid)
 
       {:cache, []} ->
         {:error, :no_signers_fetched}
@@ -69,8 +42,8 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     end
   end
 
-  def fetch_signer_and_validate_kid(kid, opts) do
-    with true <- fetch_signers(opts[:jwks_url], opts),
+  def fetch_signer_and_validate_kid(kid) do
+    with true <- fetch_signers(),
          {:cache, [{:signers, signers}]} <- {:cache, EtsCache.get_signers()},
          {:signer, signer} when not is_nil(signer) <- {:signer, signers[kid]} do
     else
@@ -78,12 +51,10 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     end
   end
 
-  @doc "Fetch signers with `JokenJwks.HttpFetcher`"
-  def fetch_signers(url, opts) do
-    opts = opts |> Keyword.put(:log_level, :debug)
-
-    with {:ok, keys} <- HttpFetcher.fetch_signers(url, opts),
-         {:ok, signers} <- validate_and_parse_keys(keys, opts) do
+  @doc "Fetch signers"
+  def fetch_signers() do
+    with {:ok, {_status_code, %{"keys" => keys}}} <- JWT.jwks(),
+         {:ok, signers} <- validate_and_parse_keys(keys) do
       Logger.debug("Fetched signers. #{inspect(signers)}")
       EtsCache.put_signers(signers)
     else
@@ -95,18 +66,18 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     end
   end
 
-  defp validate_and_parse_keys(keys, opts) when is_list(keys) do
+  defp validate_and_parse_keys(keys) when is_list(keys) do
     Enum.reduce_while(keys, {:ok, %{}}, fn key, {:ok, acc} ->
-      case parse_signer(key, opts) do
+      case parse_signer(key) do
         {:ok, signer} -> {:cont, {:ok, Map.put(acc, key["kid"], signer)}}
         e -> {:halt, e}
       end
     end)
   end
 
-  defp parse_signer(key, opts) do
+  defp parse_signer(key) do
     with {:kid, kid} when is_binary(kid) <- {:kid, key["kid"]},
-         {:ok, alg} <- get_algorithm(key["alg"], opts[:explicit_alg]),
+         {:ok, alg} <- get_algorithm(key["alg"]),
          {:ok, _signer} = res <- {:ok, Signer.create(alg, key)} do
       res
     else
@@ -128,14 +99,9 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
       {:error, :invalid_key_params}
   end
 
-  # According to JWKS spec (https://tools.ietf.org/html/rfc7517#section-4.4) the "alg"" claim
-  # is not mandatory. This is why we allow this to be passed as a hook option.
-  #
-  # We give preference to the one provided as option
-  defp get_algorithm(nil, nil), do: {:error, :no_algorithm_supplied}
-  defp get_algorithm(_, alg) when is_binary(alg), do: {:ok, alg}
-  defp get_algorithm(alg, _) when is_binary(alg), do: {:ok, alg}
-  defp get_algorithm(_, _), do: {:error, :bad_algorithm}
+  defp get_algorithm(nil), do: {:error, :no_algorithm_supplied}
+  defp get_algorithm(alg) when is_binary(alg), do: {:ok, alg}
+  defp get_algorithm(_), do: {:error, :bad_algorithm}
 end
 
 defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do

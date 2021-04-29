@@ -9,14 +9,7 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   alias FusionJWTAuthentication.TokenCertificateStore
   alias FusionJWTAuthentication.TokenJWKS
   alias FusionJWTAuthentication.Support.TestUtils
-  alias FusionJWTAuthentication.JWKS_Strategy
   alias Joken.Signer
-
-  import Mox
-  import Tesla.Mock, only: [json: 1]
-
-  setup :set_mox_global
-  setup :verify_on_exit!
 
   setup do
     {:ok, cas_token: "1111111111111111111111111111111111111"}
@@ -133,13 +126,8 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   describe "fusion jwt auth plug using JWKS endpoint" do
     setup do
       Application.put_env(:fusion_jwt_authentication, :token_verifier, TokenJWKS)
-      url = "https://fusionauth.test.well-known/jwks.json"
 
-      expect(TeslaAdapterMock, :call, fn _, _ ->
-        {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
-      end)
-
-      FusionJWTAuthentication.JWKS_Strategy.start_link(jwks_url: url, log_level: :debug)
+      FusionJWTAuthentication.JWKS_Strategy.start_link([])
 
       on_exit(fn ->
         Application.delete_env(:fusion_jwt_authentication, :token_verifier)
@@ -153,7 +141,6 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
         "aud" => "11111111-1111-1111-1111-111111111111"
       }
 
-      setup_jwks()
       jwt = TokenJWKS.generate_and_sign!(claims, TestUtils.create_signer_with_kid("id2"))
 
       conn =
@@ -169,17 +156,12 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
     end
 
     test "if kid does not match, returns 401", %{cas_token: cas_token} do
-      expect(TeslaAdapterMock, :call, fn _one, _two ->
-        {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
-      end)
-
       claims = %{
         "cas_token" => cas_token,
         "exp" => Joken.current_time() + 120,
         "aud" => "11111111-1111-1111-1111-111111111111"
       }
 
-      setup_jwks()
       jwt = TokenJWKS.generate_and_sign!(claims, TestUtils.create_signer_with_kid("id4"))
 
       conn =
@@ -192,15 +174,5 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
       assert conn.status == 401
       assert conn.halted
     end
-  end
-
-  def setup_jwks() do
-    url = "https://fusionauth.test.well-known/jwks.json"
-
-    expect(TeslaAdapterMock, :call, fn _, _ ->
-      {:ok, json(%{"keys" => [TestUtils.build_key("id1"), TestUtils.build_key("id2")]})}
-    end)
-
-    JWKS_Strategy.fetch_signers(url, log_level: :debug)
   end
 end
