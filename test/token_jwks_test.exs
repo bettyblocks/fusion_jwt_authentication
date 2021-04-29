@@ -26,8 +26,8 @@ defmodule FusionJWTAuthentication.TokenJWKSTest do
     end
 
     test "if jwks signers does not exist in ets cache it does a refetch" do
-      :ets.delete(FusionJWTAuthentication.JWKS_Strategy.EtsCache, :signers)
-
+      :timer.sleep(10)
+      :ets.delete(FusionJWTAuthentication.JWKS_Strategy.EtsCache, "id2")
       jwt = TokenJWKS.generate_and_sign!(%{}, TestUtils.create_signer_with_kid("id2"))
 
       assert {:ok, claims} = TokenJWKS.verify(jwt)

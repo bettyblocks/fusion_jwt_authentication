@@ -127,7 +127,8 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
     setup do
       Application.put_env(:fusion_jwt_authentication, :token_verifier, TokenJWKS)
 
-      FusionJWTAuthentication.JWKS_Strategy.start_link([])
+      # FusionJWTAuthentication.JWKS_Strategy.start_link([])
+      start_supervised(FusionJWTAuthentication.JWKS_Strategy)
 
       on_exit(fn ->
         Application.delete_env(:fusion_jwt_authentication, :token_verifier)

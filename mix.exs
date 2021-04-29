@@ -8,7 +8,7 @@ defmodule FusionJWTAuthentication.MixProject do
       elixir: "~> 1.9",
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      elixirc_options: [warnings_as_errors: false],
+      elixirc_options: [warnings_as_errors: true],
       package: package(),
       start_permanent: Mix.env() == :prod,
       build_embedded: Mix.env() == :prod,

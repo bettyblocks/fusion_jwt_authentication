@@ -1,4 +1,4 @@
-defmodule FusionJWTAuthentication.HTTPFusionMock do
+defmodule FusionJWTAuthentication.Support.HTTPFusionMock do
   @moduledoc """
   Mock client for calls to fusionauth
   """
