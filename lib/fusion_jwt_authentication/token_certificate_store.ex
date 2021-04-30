@@ -1,5 +1,8 @@
 defmodule FusionJWTAuthentication.TokenCertificateStore do
-  @moduledoc false
+  @moduledoc """
+  This module is used to verify the JWT token using fusionauth public-key endpoint.
+  To use it, set :token_verifier in config.
+  """
   use Joken.Config
 
   alias FusionJWTAuthentication.CertificateStore

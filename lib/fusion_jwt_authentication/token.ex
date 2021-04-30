@@ -2,7 +2,7 @@ defmodule FusionJWTAuthentication.Token do
   @moduledoc """
   This module is used to verify the JWT token using JWKS fusionauth endpoint
   The module overides the before_verify hook in Joken package
-  It is used when the environment variable token_verifier is set to this value
+  It is used by default as token_verifier, another module can be used by setting :token_verifier in the config.
   """
   use Joken.Config
   alias FusionJWTAuthentication.JWKS_Strategy
