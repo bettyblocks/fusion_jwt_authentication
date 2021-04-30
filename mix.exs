@@ -43,7 +43,7 @@ defmodule FusionJWTAuthentication.MixProject do
       files: ["lib", "mix.exs", "LICENSE", "README.md", "test/mock"],
       maintainers: ["Peter Arentsen"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/nulian/fusion_jwt_authentication"}
+      links: %{"GitHub" => "https://github.com/bettyblocks/fusion_jwt_authentication"}
     }
   end
 
