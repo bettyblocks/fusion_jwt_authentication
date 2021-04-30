@@ -24,9 +24,9 @@ defmodule FusionJWTAuthentication.MixProject do
     ]
   end
 
-  defp elixirc_paths(:prod), do: ["lib", "test/mock"]
+  defp elixirc_paths(:prod), do: ["lib"]
   defp elixirc_paths(:test), do: ["lib", "test/support", "test/mock"]
-  defp elixirc_paths(_), do: ["lib", "test/mock"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp dialyzer do
     [
@@ -40,7 +40,7 @@ defmodule FusionJWTAuthentication.MixProject do
 
   defp package do
     %{
-      files: ["lib", "mix.exs", "LICENSE", "README.md"],
+      files: ["lib", "mix.exs", "LICENSE", "README.md", "test/mock"],
       maintainers: ["Peter Arentsen"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/nulian/fusion_jwt_authentication"}
