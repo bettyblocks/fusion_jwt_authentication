@@ -1,6 +1,6 @@
 defmodule FusionJWTAuthentication.JWKS_Strategy do
   @moduledoc """
-  Contain strategy to fetch the JWKS if TokenJWKS is choosen as token_verifier.
+  Contain strategy to fetch the JWKS if Token is choosen as token_verifier.
   Automatically fetch the jwks when the application is started.
   Refetch the jwks once each time a kid isn't found inside the jwks.
   The jwks is cached in an ets table

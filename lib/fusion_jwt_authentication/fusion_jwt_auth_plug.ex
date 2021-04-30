@@ -5,13 +5,13 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   @behaviour Plug
   alias Plug.Conn
   alias FusionJWTAuthentication.DefaultHandleLogin
-  alias FusionJWTAuthentication.TokenCertificateStore
+  alias FusionJWTAuthentication.Token
 
   @impl true
   def init(options \\ []) do
     login_handler = Application.get_env(:fusion_jwt_authentication, :login_handler, DefaultHandleLogin)
 
-    token_verifier = Application.get_env(:fusion_jwt_authentication, :token_verifier, TokenCertificateStore)
+    token_verifier = Application.get_env(:fusion_jwt_authentication, :token_verifier, Token)
 
     Keyword.merge(options, login_handler: login_handler, token_verifier: token_verifier)
   end

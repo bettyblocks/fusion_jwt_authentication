@@ -6,16 +6,16 @@ defmodule FusionJWTAuthentication do
 
   alias FusionJWTAuthentication.CertificateStore
   alias FusionJWTAuthentication.JWKS_Strategy
-  alias FusionJWTAuthentication.TokenJWKS
+  alias FusionJWTAuthentication.TokenCertificateStore
 
   def start(_type, _args) do
     token_verifier = Application.get_env(:fusion_jwt_authentication, :token_verifier)
 
     children =
-      if token_verifier == TokenJWKS do
-        [JWKS_Strategy]
-      else
+      if token_verifier == TokenCertificateStore do
         [CertificateStore]
+      else
+        [JWKS_Strategy]
       end
 
     Supervisor.start_link(children, strategy: :one_for_one)

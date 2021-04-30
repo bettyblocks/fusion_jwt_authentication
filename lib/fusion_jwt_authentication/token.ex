@@ -1,4 +1,4 @@
-defmodule FusionJWTAuthentication.TokenJWKS do
+defmodule FusionJWTAuthentication.Token do
   @moduledoc """
   This module is used to verify the JWT token using JWKS fusionauth endpoint
   The module overides the before_verify hook in Joken package
