@@ -1,4 +1,4 @@
-defmodule Synapse.FusionAuth.CertificateStoreTest do
+defmodule FusionJWTAuthentication.CertificateStoreTest do
   use ExUnit.Case
 
   alias FusionJWTAuthentication.CertificateStore
@@ -9,6 +9,11 @@ defmodule Synapse.FusionAuth.CertificateStoreTest do
   end
 
   describe "certificate storage" do
+    setup do
+      start_supervised(CertificateStore)
+      :ok
+    end
+
     test "what happens if called without client_id" do
       assert nil == CertificateStore.get_certificate(nil)
     end

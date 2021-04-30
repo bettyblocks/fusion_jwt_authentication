@@ -3,17 +3,17 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   This plug handles JWT from fusion auth
   """
   @behaviour Plug
-
-  alias FusionJWTAuthentication.{CertificateStore, Token}
-  alias Joken.Signer
   alias Plug.Conn
+  alias FusionJWTAuthentication.DefaultHandleLogin
+  alias FusionJWTAuthentication.Token
 
   @impl true
   def init(options \\ []) do
-    login_handler =
-      Application.get_env(:fusion_jwt_authentication, :login_handler, FusionJWTAuthentication.DefaultHandleLogin)
+    login_handler = Application.get_env(:fusion_jwt_authentication, :login_handler, DefaultHandleLogin)
 
-    Keyword.put(options, :login_handler, login_handler)
+    token_verifier = Application.get_env(:fusion_jwt_authentication, :token_verifier, Token)
+
+    Keyword.merge(options, login_handler: login_handler, token_verifier: token_verifier)
   end
 
   @impl true
@@ -23,12 +23,9 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
 
   defp parse_jwt(jwt, conn, opts) when is_binary(jwt) do
     login_handler = Keyword.get(opts, :login_handler)
+    token_verifier = Keyword.get(opts, :token_verifier)
 
-    with {:ok, %{"alg" => "RS256"}} <- Joken.peek_header(jwt),
-         {:ok, claims} <- Joken.peek_claims(jwt),
-         {:ok, %{"aud" => audience}} <- Token.validate(claims),
-         certificate when is_binary(certificate) <- CertificateStore.get_certificate(audience),
-         {:ok, claims} <- Token.verify(jwt, Signer.create("RS256", %{"pem" => certificate})),
+    with {:ok, claims} <- token_verifier.verify_token(jwt),
          {:ok, conn} <- login_handler.handle_login(conn, claims) do
       conn
     else
