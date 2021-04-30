@@ -71,9 +71,9 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   end
 
   defp validate_and_parse_keys(keys) when is_list(keys) do
-    Enum.reduce_while(keys, {:ok, %{}}, fn key, {:ok, acc} ->
+    Enum.reduce_while(keys, {:ok, []}, fn key, {:ok, acc} ->
       case parse_signer(key) do
-        {:ok, signer} -> {:cont, {:ok, Map.put(acc, key["kid"], signer)}}
+        {:ok, signer} -> {:cont, {:ok, [{key["kid"], signer} | acc]}}
         e -> {:halt, e}
       end
     end)
@@ -112,7 +112,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
   @doc "Starts ETS cache"
   def new do
     __MODULE__ =
-      :ets.new(__MODULE__, [:ordered_set, :protected, :named_table, read_concurrency: true, write_concurrency: true])
+      :ets.new(__MODULE__, [:ordered_set, :protected, :named_table, read_concurrency: true])
   end
 
   @doc "Loads fetched signers"
@@ -122,6 +122,6 @@ defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
 
   @doc "Puts fetched signers"
   def put_signers(signers) do
-    Enum.map(signers, fn {kid, signer} -> :ets.insert(__MODULE__, {kid, signer}) end)
+    :ets.insert(__MODULE__, signers)
   end
 end
