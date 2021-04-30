@@ -1,7 +1,7 @@
 defmodule FusionJWTAuthentication.JWKS_Strategy do
   @moduledoc """
   Contain strategy to fetch the JWKS if TokenJWKS is choosen as token_verifier.
-  Automatically fetch the jwks when fusionauth application is started.
+  Automatically fetch the jwks when the application is started.
   Refetch the jwks once each time a kid isn't found inside the jwks.
   The jwks is cached in an ets table
   """
@@ -26,8 +26,14 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   @impl true
   def handle_continue(:do_init, _state) do
     EtsCache.new()
-    fetch_and_cache()
+    fetch_and_cache_signers()
     {:noreply, %{}}
+  end
+
+  @impl true
+  def handle_call(:fetch_signers, _from, state) do
+    fetch_and_cache_signers()
+    {:reply, nil, state}
   end
 
   def match_signer_for_kid(kid) do
@@ -40,7 +46,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   end
 
   def fetch_signer_and_match_kid(kid) do
-    fetch_and_cache()
+    GenServer.call(__MODULE__, :fetch_signers, 10000)
 
     with [{^kid, signer}] <- EtsCache.get_signer(kid) do
       {:ok, signer}
@@ -49,8 +55,8 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     end
   end
 
-  @doc "Fetch signers"
-  def fetch_and_cache() do
+  @doc "Fetch signers and save them in the ets table"
+  def fetch_and_cache_signers() do
     with {:ok, {_status_code, %{"keys" => keys}}} <- JWT.jwks(),
          {:ok, signers} <- validate_and_parse_keys(keys) do
       Logger.debug("Fetched signers. #{inspect(signers)}")
@@ -106,7 +112,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
   @doc "Starts ETS cache"
   def new do
     __MODULE__ =
-      :ets.new(__MODULE__, [:ordered_set, :public, :named_table, read_concurrency: true, write_concurrency: true])
+      :ets.new(__MODULE__, [:ordered_set, :protected, :named_table, read_concurrency: true, write_concurrency: true])
   end
 
   @doc "Loads fetched signers"
