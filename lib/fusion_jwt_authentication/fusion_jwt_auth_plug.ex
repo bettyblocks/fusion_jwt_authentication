@@ -18,7 +18,22 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
 
   @impl true
   def call(conn, options) do
-    parse_jwt(conn.cookies["jwt_token"], conn, options)
+    conn
+    |> extract_jwt()
+    |> parse_jwt(conn, options)
+  end
+
+  defp extract_jwt(conn) do
+    with :bearer <- Application.get_env(:fusion_jwt_authentication, :jwt_location),
+         ["Bearer " <> token] <- Conn.get_req_header(conn, "authorization") do
+      token
+    else
+      [] ->
+        send_unauthorized_response(conn)
+
+      _ ->
+        conn.cookies["jwt_token"]
+    end
   end
 
   defp parse_jwt(jwt, conn, opts) when is_binary(jwt) do

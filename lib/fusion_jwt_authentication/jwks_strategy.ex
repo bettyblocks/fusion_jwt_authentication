@@ -111,8 +111,7 @@ end
 defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
   @doc "Starts ETS cache"
   def new do
-    __MODULE__ =
-      :ets.new(__MODULE__, [:ordered_set, :protected, :named_table, read_concurrency: true])
+    __MODULE__ = :ets.new(__MODULE__, [:ordered_set, :protected, :named_table, read_concurrency: true])
   end
 
   @doc "Loads fetched signers"
