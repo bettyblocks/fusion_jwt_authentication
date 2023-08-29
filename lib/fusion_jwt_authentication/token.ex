@@ -12,7 +12,7 @@ defmodule FusionJWTAuthentication.Token do
     default_claims(Application.get_env(:fusion_jwt_authentication, :claim_options))
   end
 
-  def verify_token(jwt), do: verify(jwt)
+  def verify_token(jwt), do: verify_and_validate(jwt)
 
   @impl true
   def before_verify(hook_options, {token, _signer}) do
