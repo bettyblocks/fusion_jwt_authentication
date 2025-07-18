@@ -6,13 +6,13 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   The jwks is cached in an ets table
   """
 
-  require Logger
+  use GenServer, restart: :permanent
 
   alias __MODULE__.EtsCache
-  alias Joken.Signer
   alias FusionJWTAuthentication.API.JWT
+  alias Joken.Signer
 
-  use GenServer, restart: :permanent
+  require Logger
 
   def start_link(arg) do
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
@@ -37,36 +37,35 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
   end
 
   def match_signer_for_kid(kid) do
-    with [{^kid, signer}] <- EtsCache.get_signer(kid) do
-      {:ok, signer}
-    else
+    case EtsCache.get_signer(kid) do
+      [{^kid, signer}] -> {:ok, signer}
       [] -> fetch_signer_and_match_kid(kid)
       err -> err
     end
   end
 
   def fetch_signer_and_match_kid(kid) do
-    GenServer.call(__MODULE__, :fetch_signers, 10000)
+    GenServer.call(__MODULE__, :fetch_signers, 10_000)
 
-    with [{^kid, signer}] <- EtsCache.get_signer(kid) do
-      {:ok, signer}
-    else
+    case EtsCache.get_signer(kid) do
+      [{^kid, signer}] -> {:ok, signer}
       _ -> {:error, :kid_does_not_match}
     end
   end
 
   @doc "Fetch signers and save them in the ets table"
-  def fetch_and_cache_signers() do
+  def fetch_and_cache_signers do
     with {:ok, {_status_code, %{"keys" => keys}}} <- JWT.jwks(),
-         {:ok, signers} <- validate_and_parse_keys(keys) do
+         {:ok, signers} <-
+           validate_and_parse_keys(keys) do
       Logger.debug("Fetched signers. #{inspect(signers)}")
       EtsCache.put_signers(signers)
     else
       {:error, _reason} = err ->
-        Logger.warn("#{__MODULE__} failed to fetch signers. Reason: #{inspect(err)}")
+        Logger.warning("#{__MODULE__} failed to fetch signers. Reason: #{inspect(err)}")
 
       err ->
-        Logger.warn("#{__MODULE__} got an unexpected error while fetching signers. Reason: #{inspect(err)}")
+        Logger.warning("#{__MODULE__} got an unexpected error while fetching signers. Reason: #{inspect(err)}")
     end
   end
 
@@ -90,7 +89,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
     end
   rescue
     e ->
-      Logger.warn("""
+      Logger.warning("""
       Error while parsing a key entry fetched from the network.
 
       This should be investigated by a human.
@@ -109,6 +108,7 @@ defmodule FusionJWTAuthentication.JWKS_Strategy do
 end
 
 defmodule FusionJWTAuthentication.JWKS_Strategy.EtsCache do
+  @moduledoc false
   @doc "Starts ETS cache"
   def new do
     __MODULE__ =

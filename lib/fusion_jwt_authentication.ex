@@ -18,6 +18,24 @@ defmodule FusionJWTAuthentication do
         [JWKS_Strategy]
       end
 
-    Supervisor.start_link(children, strategy: :one_for_one)
+    Supervisor.start_link([{Finch, name: MyFinch, pools: %{default: finch_config()}}] ++ children,
+      strategy: :one_for_one
+    )
+  end
+
+  defp finch_config do
+    case Application.get_env(:fusion_jwt_authentication, :custom_ca_cert) do
+      cert when is_binary(cert) and byte_size(cert) > 0 ->
+        [
+          conn_opts: [
+            transport_opts: [
+              cacertfile: cert
+            ]
+          ]
+        ]
+
+      _ ->
+        []
+    end
   end
 end

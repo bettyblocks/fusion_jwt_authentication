@@ -1,14 +1,14 @@
 defmodule FusionJWTAuthentication.FusionJWTAuthPlugTest do
   use ExUnit.Case
-  use Plug.Test
 
   import Plug.Conn
+  import Plug.Test
 
   alias FusionJWTAuthentication.FusionJWTAuthPlug
   alias FusionJWTAuthentication.Support.FusionGlobalAppCertificate
+  alias FusionJWTAuthentication.Support.TestUtils
   alias FusionJWTAuthentication.Token
   alias FusionJWTAuthentication.TokenCertificateStore
-  alias FusionJWTAuthentication.Support.TestUtils
   alias Joken.Signer
 
   setup do

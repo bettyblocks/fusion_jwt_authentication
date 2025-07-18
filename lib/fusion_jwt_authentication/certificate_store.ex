@@ -10,7 +10,7 @@ defmodule FusionJWTAuthentication.CertificateStore do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  @spec get_certificate(FusionJWTAuthentication.API.JWT.uuid()) :: String.t() | nil
+  @spec get_certificate(JWT.uuid()) :: String.t() | nil
   def get_certificate(client_id) do
     case :ets.whereis(:certificate_store) do
       :undefined ->
@@ -18,7 +18,7 @@ defmodule FusionJWTAuthentication.CertificateStore do
 
       ref ->
         case :ets.lookup(ref, client_id) do
-          [] -> GenServer.call(__MODULE__, {:fetch_certificate, client_id}, 10000)
+          [] -> GenServer.call(__MODULE__, {:fetch_certificate, client_id}, 10_000)
           [{_key, result}] -> result
         end
     end

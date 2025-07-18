@@ -5,6 +5,7 @@ defmodule FusionJWTAuthentication.Token do
   It is used by default as token_verifier, another module can be used by setting :token_verifier in the config.
   """
   use Joken.Config
+
   alias FusionJWTAuthentication.JWKS_Strategy
 
   @impl true
@@ -16,8 +17,9 @@ defmodule FusionJWTAuthentication.Token do
 
   @impl true
   def before_verify(hook_options, {token, _signer}) do
-    with strategy <- hook_options[:strategy] || JWKS_Strategy,
-         {:ok, kid} <- get_token_kid(token),
+    strategy = hook_options[:strategy] || JWKS_Strategy
+
+    with {:ok, kid} <- get_token_kid(token),
          {:ok, signer} <- strategy.match_signer_for_kid(kid) do
       {:cont, {token, signer}}
     else

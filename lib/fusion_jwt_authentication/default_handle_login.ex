@@ -2,9 +2,9 @@ defmodule FusionJWTAuthentication.DefaultHandleLogin do
   @moduledoc """
   Login that requires a cas token
   """
-  alias Plug.Conn
-
   @behaviour FusionJWTAuthentication.HandleLogin
+
+  alias Plug.Conn
 
   @impl true
   def handle_login(conn, %{"cas_token" => cas_token}) do

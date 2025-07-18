@@ -4,8 +4,8 @@ defmodule FusionJWTAuthentication.MixProject do
   def project do
     [
       app: :fusion_jwt_authentication,
-      version: "1.1.0",
-      elixir: "~> 1.9",
+      version: "2.0.0",
+      elixir: "~> 1.14",
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
       elixirc_options: [warnings_as_errors: true],
@@ -58,14 +58,16 @@ defmodule FusionJWTAuthentication.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:credo, ">= 0.0.0", only: :dev},
+      {:dialyxir, "~> 1.4.5", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.12", only: :test},
+      {:finch, "~> 0.20"},
+      {:jason, "~> 1.0"},
       {:joken, "~> 2.0"},
       {:plug, "~> 1.11"},
-      {:httpoison, "~> 1.4"},
-      {:jason, "~> 1.0"},
-      {:credo, ">= 0.0.0", only: :dev},
-      {:excoveralls, "~> 0.12", only: :test},
-      {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:styler, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:tesla, "~> 1.14"}
     ]
   end
 end

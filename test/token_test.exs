@@ -1,8 +1,9 @@
 defmodule FusionJWTAuthentication.TokenTest do
   use ExUnit.Case, async: false
-  alias FusionJWTAuthentication.Token
+
   alias FusionJWTAuthentication.JWKS_Strategy
   alias FusionJWTAuthentication.Support.TestUtils
+  alias FusionJWTAuthentication.Token
 
   describe "test JWKS token" do
     setup do
