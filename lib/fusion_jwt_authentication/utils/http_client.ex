@@ -10,23 +10,22 @@ defmodule FusionJWTAuthentication.Utils.HTTPClient do
   @adapter Application.compile_env(:fusion_jwt_authentication, :http_client, {Tesla.Adapter.Finch, [name: MyFinch]})
 
   @spec client(binary | nil) :: Tesla.Client.t()
-  def client(tenant_id \\ nil) do
-    Tesla.client(middleware(tenant_id), @adapter)
+  def client(authorization \\ false) do
+    Tesla.client(middleware(authorization), @adapter)
   end
 
-  defp middleware(tenant_id) do
+  defp middleware(authorization) do
     base_middleware = [
       {Tesla.Middleware.BaseUrl, Application.get_env(:fusion_jwt_authentication, :base_url)},
       Tesla.Middleware.JSON
     ]
 
-    if tenant_id do
+    if authorization do
       base_middleware ++
         [
           {Tesla.Middleware.Headers,
            [
-             {"authorization", Application.get_env(:fusion_jwt_authentication, :fusionauth_api)},
-             {"X-FusionAuth-TenantId", tenant_id}
+             {"authorization", Application.get_env(:fusion_jwt_authentication, :fusionauth_api)}
            ]}
         ]
     else
