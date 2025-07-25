@@ -7,7 +7,11 @@ defmodule FusionJWTAuthentication.Utils.HTTPClient do
   when that occurs.
   """
 
-  @adapter Application.compile_env(:fusion_jwt_authentication, :http_client, {Tesla.Adapter.Finch, [name: MyFinch]})
+  @adapter Application.compile_env(
+             :fusion_jwt_authentication,
+             :http_client,
+             {Tesla.Adapter.Finch, [name: FusionJWTAuthentication.MyFinch]}
+           )
 
   @spec client(binary | nil) :: Tesla.Client.t()
   def client(authorization \\ false) do

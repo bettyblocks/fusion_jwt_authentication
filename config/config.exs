@@ -1,7 +1,7 @@
 import Config
 
 config :fusion_jwt_authentication,
-  http_client: {Tesla.Adapter.Finch, [name: MyFinch]},
+  http_client: {Tesla.Adapter.Finch, [name: FusionJWTAuthentication.MyFinch]},
   claim_options: [],
   error_view: FusionJWTAuthentication.ErrorView,
   base_url: ""

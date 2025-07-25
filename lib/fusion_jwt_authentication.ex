@@ -18,7 +18,8 @@ defmodule FusionJWTAuthentication do
         [JWKS_Strategy]
       end
 
-    Supervisor.start_link([{Finch, name: MyFinch, pools: %{default: finch_config()}}] ++ children,
+    Supervisor.start_link(
+      [{Finch, name: FusionJWTAuthentication.MyFinch, pools: %{default: finch_config()}}] ++ children,
       strategy: :one_for_one
     )
   end
