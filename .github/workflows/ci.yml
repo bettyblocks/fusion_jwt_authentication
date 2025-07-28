@@ -28,6 +28,7 @@ jobs:
           path: |
             _build
             deps
+            priv/plts
           key: ${{ runner.os }}-elixir-${{ hashFiles('mix.lock') }}
       - uses: erlef/setup-beam@v1
         with:
