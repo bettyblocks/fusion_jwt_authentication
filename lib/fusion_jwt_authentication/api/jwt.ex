@@ -3,7 +3,7 @@ defmodule FusionJWTAuthentication.API.JWT do
   Handles api request to FusionAuth jwt endpoints
   """
   alias FusionJWTAuthentication.API.Response
-  alias FusionJWTAuthentication.Utils.HTTPClient
+  alias FusionJWTAuthentication.HTTPClient
 
   @typedoc """
   A hex-encoded UUID string.

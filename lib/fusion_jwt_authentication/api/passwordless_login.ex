@@ -2,7 +2,7 @@ defmodule FusionJWTAuthentication.API.PasswordlessLogin do
   @moduledoc false
 
   alias FusionJWTAuthentication.API.Response
-  alias FusionJWTAuthentication.Utils.HTTPClient
+  alias FusionJWTAuthentication.HTTPClient
 
   def start(application_id, login_id, state) do
     true

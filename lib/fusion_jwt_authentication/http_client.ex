@@ -1,4 +1,4 @@
-defmodule FusionJWTAuthentication.Utils.HTTPClient do
+defmodule FusionJWTAuthentication.HTTPClient do
   @moduledoc """
   Perform HTTP-requests to Fusionauth to fetch applications
   The requests will authenticate with an API-key that is authorized in FusionAuth to use
