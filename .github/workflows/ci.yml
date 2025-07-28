@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  mix_test:
+    runs-on: ubuntu-24.04
+    env:
+      MIX_ENV: test
+    name: Elixir ${{ matrix.pair.elixir }} / OTP ${{ matrix.pair.otp }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - pair:
+              elixir: 1.18.4
+              otp: 27.3.4
+            lint: lint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Elixir
+        uses: actions/cache@v4
+        with:
+          path: |
+            _build
+            deps
+          key: ${{ runner.os }}-elixir-${{ hashFiles('mix.lock') }}
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.pair.otp}}
+          elixir-version: ${{matrix.pair.elixir}}
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.compile
+
+      - run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
+
+      - run: mix dialyzer
+
+      - run: mix test
