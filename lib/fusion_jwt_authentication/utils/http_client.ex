@@ -13,7 +13,7 @@ defmodule FusionJWTAuthentication.Utils.HTTPClient do
              {Tesla.Adapter.Finch, [name: FusionJWTAuthentication.MyFinch]}
            )
 
-  @spec client(binary | nil) :: Tesla.Client.t()
+  @spec client(boolean) :: Tesla.Client.t()
   def client(authorization \\ false) do
     Tesla.client(middleware(authorization), @adapter)
   end
