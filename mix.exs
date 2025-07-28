@@ -59,7 +59,7 @@ defmodule FusionJWTAuthentication.MixProject do
   defp deps do
     [
       {:credo, ">= 0.0.0", only: :dev},
-      {:dialyxir, "~> 1.4.5", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.4.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.12", only: :test},
       {:finch, "~> 0.20"},
