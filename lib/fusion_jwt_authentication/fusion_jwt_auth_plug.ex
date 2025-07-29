@@ -3,9 +3,10 @@ defmodule FusionJWTAuthentication.FusionJWTAuthPlug do
   This plug handles JWT from fusion auth
   """
   @behaviour Plug
-  alias Plug.Conn
+
   alias FusionJWTAuthentication.DefaultHandleLogin
   alias FusionJWTAuthentication.Token
+  alias Plug.Conn
 
   @impl true
   def init(options \\ []) do
