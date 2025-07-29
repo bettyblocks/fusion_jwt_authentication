@@ -4,7 +4,7 @@ defmodule FusionJWTAuthentication.MixProject do
   def project do
     [
       app: :fusion_jwt_authentication,
-      version: "2.0.0",
+      version: "2.0.1",
       elixir: "~> 1.14",
       description: description(),
       elixirc_paths: elixirc_paths(Mix.env()),
