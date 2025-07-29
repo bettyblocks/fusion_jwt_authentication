@@ -49,6 +49,33 @@ defmodule FusionJWTAuthentication.Support.HTTPFusionMock do
      }}
   end
 
+  def call(%Tesla.Env{method: :post, url: "http://auth.betty.docker/api/passwordless/start", body: body}, _) do
+    case Jason.decode!(body) do
+      %{"state" => %{"status" => status}} ->
+        {:ok, %Tesla.Env{status: status}}
+
+      _ ->
+        {:ok, %Tesla.Env{body: %{"code" => "CynAUMCHLxCCAWyHXOVWPQd8ZY0a6U0e3YpYkT0MNxs"}, status: 200}}
+    end
+  end
+
+  def call(%Tesla.Env{method: :post, url: "http://auth.betty.docker/api/passwordless/login", body: body}, _) do
+    case Jason.decode!(body) do
+      %{"code" => "logincodesuccess"} ->
+        {:ok,
+         %Tesla.Env{
+           body: %{"token" => "token", "refreshToken" => "refreshToken", "state" => %{"prompt" => "prompt"}},
+           status: 200
+         }}
+
+      %{"code" => "invalid"} ->
+        {:ok, %Tesla.Env{status: 400}}
+
+      %{"code" => "not_found"} ->
+        {:ok, %Tesla.Env{status: 404}}
+    end
+  end
+
   def call(_, _) do
     {:error, :not_implemented}
   end
