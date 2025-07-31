@@ -73,6 +73,9 @@ defmodule FusionJWTAuthentication.Support.HTTPFusionMock do
 
       %{"code" => "not_found"} ->
         {:ok, %Tesla.Env{status: 404}}
+
+      _ ->
+        {:error, :invalid}
     end
   end
 
